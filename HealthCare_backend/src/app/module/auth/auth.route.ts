@@ -41,6 +41,11 @@ router.post(
 	validateRequest(UserValidation.LoginZodSchema),
 	AuthController.loginUser,
 );
+router.post(
+	"/forgot-password",
+	validateRequest(UserValidation.ForgotPasswordZodSchema),
+	AuthController.forgotPassword
+);
 router.get(
 	"/me",
 	auth(Role.ADMIN, Role.DOCTOR, Role.PATIENT, Role.SUPER_ADMIN),
