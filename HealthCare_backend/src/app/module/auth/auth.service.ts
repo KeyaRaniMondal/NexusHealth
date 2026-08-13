@@ -21,6 +21,7 @@ import type {
 	IResetpassword,
 } from "./auth.interface";
 import { redisClient } from "../../lib/redis";
+import { transporter } from "../../lib/nodemailer";
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
 	const { name, password, patient: patientData } = payload;
@@ -362,9 +363,15 @@ const forgotPassword = async (payload: IForgotPassword) => {
 			value: 5 * 60,
 		},
 	});
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: isUserExists.email,
+		subject: "OTP for password change",
+		text: `your OTP is ${otp}`,
+	});
 };
 const resetPassword = async (payload: IResetpassword) => {
-	const { email, otp, password } = payload;
+	const { email, otp, newPassword } = payload;
 
 	const isUserExists = await prisma.user.findUnique({
 		where: { email },
@@ -376,22 +383,27 @@ const resetPassword = async (payload: IResetpassword) => {
 		throw new Error("user is deleted");
 	if (isUserExists.googleId || isUserExists.authProvider === "GOOGLE")
 		throw new Error("user has account with google ");
-	const key = `forgot-password-${isUserExists.email}`;
+	const key = `forgot-password-otp:${isUserExists.email}`;
 
 	const redisOTP = await redisClient.get(key);
 	if (!redisOTP) throw new Error("invalid otp");
-	if (redisOTP !== payload.otp) throw new Error("tp doesn't match");
+	if (String(redisOTP) !== String(otp)) throw new Error("otp doesn't match");
 
-	const hashedPassword = await bcrypt.hash(
-		payload.password,
+	const hashedNewPassword = await bcrypt.hash(
+		newPassword,
 		Number(config.bcrypt_salt_rounds),
 	);
-	const updatePassword = await prisma.user.update({
+	await prisma.user.update({
 		where: { email: isUserExists.email },
-		data: { password: hashedPassword },
+		data: { password: hashedNewPassword },
 	});
-	await redisClient.del(key);
-	return updatePassword;
+	await redisClient.del([key]);
+	await transporter.sendMail({
+		from: config.email_sender,
+		to: isUserExists.email,
+		subject: "Password Reset Successful",
+		text: `password got changeed into new one`,
+	});
 };
 export const AuthService = {
 	registerPatient,
