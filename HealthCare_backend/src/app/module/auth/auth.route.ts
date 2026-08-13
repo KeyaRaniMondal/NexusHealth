@@ -44,7 +44,12 @@ router.post(
 router.post(
 	"/forgot-password",
 	validateRequest(UserValidation.ForgotPasswordZodSchema),
-	AuthController.forgotPassword
+	AuthController.forgotPassword,
+);
+router.post(
+	"/reset-password",
+	validateRequest(UserValidation.ResetPasswordZodSchema),
+	AuthController.resetPassword,
 );
 router.get(
 	"/me",
