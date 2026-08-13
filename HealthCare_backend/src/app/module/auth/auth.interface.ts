@@ -25,11 +25,11 @@ export interface IGoogleLoginPayload {
 	idToken: string;
 }
 
-export interface IForgotPassword{
-	email:string;
+export interface IForgotPassword {
+	email: string;
 }
-export interface IResetpassword{
-	email:string;
-	password:string;
-	otp:string;
+export interface IResetpassword {
+	email: string;
+	password: string;
+	otp: string;
 }
