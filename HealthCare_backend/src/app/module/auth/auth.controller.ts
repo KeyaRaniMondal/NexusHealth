@@ -167,11 +167,13 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 });
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
+
 	await AuthService.resetPassword(payload);
+
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
-		message: `Password reset successfully for email ${payload.email}`,
+		message: "Password Changed Successfully",
 		data: null,
 	});
 });
