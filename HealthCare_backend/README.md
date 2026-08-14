@@ -1,4 +1,4 @@
-# PH Healthcare System — Backend
+#  Healthcare System — Backend
 
 REST API for a doctor-appointment platform: patients book consultations, doctors run them, admins manage the platform. This repo is the backend only.
 
@@ -36,7 +36,7 @@ cp .env.example .env
 Open `.env` and point `DATABASE_URL` at a Postgres database you can connect to:
 
 ```
-DATABASE_URL="postgresql://YOUR_USERNAME:YOUR_PASSWORD@localhost:5432/ph_healthcare?schema=public"
+DATABASE_URL="postgresql://YOUR_USERNAME:YOUR_PASSWORD@localhost:5432/healthcare?schema=public"
 ```
 
 The database doesn't need to exist beforehand — `prisma migrate dev` creates it. The other variables in `.env.example` are fine to leave as-is for local development; see [Environment variables](#environment-variables) for what each one does.
@@ -74,7 +74,7 @@ Confirm it's up:
 
 ```bash
 curl http://localhost:5000/
-# {"success":true,"message":"Welcome to PH Healthcare System Backend"}
+# {"success":true,"message":"Welcome to  Healthcare System Backend"}
 ```
 
 ## Environment variables
