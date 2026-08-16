@@ -1,56 +1,64 @@
-import { UploadApiResponse } from "cloudinary"
-import { prisma } from "../../lib/prisma"
-import { cloudinary } from "../../lib/cloudinary"
+import { UploadApiResponse } from "cloudinary";
+import { prisma } from "../../lib/prisma";
+import { cloudinary } from "../../lib/cloudinary";
 
-const uploadProfileImage=async(buffer:Buffer,userId:string)=>{
-    const currentUser=await prisma.user.findUnique({
-        where:{
-            id:userId
+const uploadProfileImage = async (buffer: Buffer, userId: string) => {
+    const currentUser = await prisma.user.findUnique({
+        where: {
+            id: userId
         },
-        select:{
-            imagePublicId:true,
-            imageUrl:true
+        select: {
+            imagePublicId: true,
+            imageUrl: true
         }
-    })
+    });
 
-    const cloudinaryResult=await new Promise<UploadApiResponse>((resolve,reject)=>{
-        cloudinary.uploader.upload_stream({
-            resource_type:"auto"
-        },
-        async(error,result)=>{
-            if(error)
-            {
-                return reject(error)
-            }
-            
-                if(!result){
-                    return reject(new Error("No result returned from Cloudinary"));
-                }
+    const cloudinaryResult = await new Promise<UploadApiResponse>(
+        (resolve, reject) => {
+            cloudinary.uploader
+                .upload_stream(
+                    {
+                        resource_type: "auto"
+                    },
+                    async (error, result) => {
+                        if (error) {
+                            return reject(error);
+                        }
 
-                resolve(result);
+                        if (!result) {
+                            return reject(
+                                new Error("No result returned from Cloudinary")
+                            );
+                        }
+
+                        resolve(result);
+                    }
+                )
+                .end(buffer);
         }
-    ).end(buffer)
-    })
+    );
 
-    const updatedUser=await prisma.user.update({
-        where:{
-            id:userId
+    const updatedUser = await prisma.user.update({
+        where: {
+            id: userId
         },
-data:{
-    imageUrl:cloudinaryResult.secure_url,
-    imagePublicId:cloudinaryResult.public_id
-},
-omit:{
-    password:true
-}
-    })
-    if(currentUser?imagePublicId && currentUser.imageUrl)
-    {
-        await cloudinary.uploader.destroy(currentUser.imagePublicId)
+        data: {
+            imageUrl: cloudinaryResult.secure_url,
+            imagePublicId: cloudinaryResult.public_id
+        },
+        omit: {
+            password: true
+        }
+    });
+
+    // Delete previous profile image from Cloudinary
+    if (currentUser?.imagePublicId && currentUser.imageUrl) {
+        await cloudinary.uploader.destroy(currentUser.imagePublicId);
     }
-    return updatedUser
-}
 
-export const UserServices={
+    return updatedUser;
+};
+
+export const UserServices = {
     uploadProfileImage
-}
+};
