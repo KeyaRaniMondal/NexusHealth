@@ -13,6 +13,7 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 import { UserRoutes } from "./app/module/users/user.route";
+import { BkashIdToken } from "./app/lib/bkash";
 
 const app: Application = express();
 
@@ -65,6 +66,15 @@ app.post("/zod", async (req: Request, res: Response, next: NextFunction) => {
 	}
 });
 
+// test route
+app.get("/test", async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const getIdTokenResult = await BkashIdToken();
+		console.log(getIdTokenResult);
+	} catch (error) {
+		console.log(error);
+	}
+});
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
 	res.status(httpStatus.OK).json({
