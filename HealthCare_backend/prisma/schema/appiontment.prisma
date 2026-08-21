@@ -1,0 +1,10 @@
+model Appointment {
+id String @id @default(uuid())
+
+status AppionementStatus @default(PENDING)
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+payment Payment?  //In model Appointment, payment Payment must be optional (payment Payment?). Because Payment holds the foreign key (appointmentId), an Appointment can exist before a Payment is created.
+
+@@map("appointments")
+}
