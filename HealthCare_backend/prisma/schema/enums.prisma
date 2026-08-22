@@ -29,6 +29,7 @@ enum AppionementStatus {
   ONGOING
   COMPLETED
 }
+
 enum PaymentStatus {
   UNPAID
   PAID
