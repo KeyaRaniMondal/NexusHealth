@@ -5,23 +5,38 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
-	const result = await AppointmentServices.bookAppontment();
+	const payload = req.body;
+	const user = req.user!;
+
+	const result = await AppointmentServices.bookAppontment(payload, user);
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
-		message: "User profile fetched successfully",
+		message: "Appointment payment Initiated Successfully",
 		data: result,
 	});
 });
 
+const Payment_for_appointment_completion = catchAsync(
+	async (req: Request, res: Response) => {
+		const payload = req.body;
+		const user = req.user!;
+
+		const result = await AppointmentServices.bookAppontment(payload, user);
+		sendResponse(res, {
+			statusCode: httpStatus.OK,
+			success: true,
+			message: "Appointment payment Initiated Successfully",
+			data: result,
+		});
+	},
+);
+
 const bookAppointmentCallback = catchAsync(
 	async (req: Request, res: Response) => {
-		console.log(req.query, "req.query");
-		const { executedPaymentResult, redirectUrl } =
-			await AppointmentServices.bookAppointmentCallback(req.query);
-
-		console.log({ executedPaymentResult }, "callback controller");
-
+		const { redirectUrl } = await AppointmentServices.bookAppointmentCallback(
+			req.query,
+		);
 		res.redirect(redirectUrl);
 		// sendResponse(res, {
 		//     statusCode: httpStatus.OK,
@@ -35,4 +50,5 @@ const bookAppointmentCallback = catchAsync(
 export const AppointmentController = {
 	bookAppointment,
 	bookAppointmentCallback,
+	Payment_for_appointment_completion,
 };
